@@ -198,8 +198,8 @@ class MyClient(discord.Client):
                 teamname = message.content[7:]
                 try:
                     embed = discord.Embed(title="Team {} Progress".format(teamname), color=0x7289DA)
-                    embed.add_field(name='**  **1\t 2\t\u20093\t\u20094\t\u200A5', value=" ".join([':green_square:' if get_field(team, 'solve{}'.format(str(i+1))) == '1' else ":black_large_square:" for i in range(5)]))
-                    embed.add_field(name="Hints", value="{} hints remaining.".format(get_field(team, "hints")),
+                    embed.add_field(name='**  **1\t 2\t\u20093\t\u20094\t\u200A5', value=" ".join([':green_square:' if get_field(get_teamid(teamname), 'solve{}'.format(str(i+1))) == '1' else ":black_large_square:" for i in range(5)]))
+                    embed.add_field(name="Hints", value="{} hints remaining.".format(get_field(get_teamid(teamname), "hints")),
                                     inline=False)
                     await message.channel.send(embed=embed)
 
