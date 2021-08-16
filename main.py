@@ -205,6 +205,7 @@ class MyClient(discord.Client):
 
                 except TypeError:
                     await message.channel.send('Team not found! Make sure you type the team name exactly, case sensitive.')
+
             elif message_words[0] == '!getid':
                 person = message.content[7:]
                 x = discord.utils.get(client.get_all_members(), name="{}".format(person[:-5]), discriminator="{}".format(person[-4:])).id
@@ -221,6 +222,10 @@ class MyClient(discord.Client):
                         await message.channel.send('ALERT: team **{}** already had 0 hints remaining!'.format(teamname))
                 except TypeError:
                     await message.channel.send('Team not found! Make sure you type the team name exactly, case sensitive.')
+
+            elif message.content == '!send':
+                sendchannel = client.get_channel(866295094864510986)
+                await sendchannel.send("<:haLove:819493073994252308>")
 
             elif message.content == '!getpuzzles':
                 if hunt_started:
@@ -331,7 +336,7 @@ class MyClient(discord.Client):
 
 
 intents = discord.Intents().all()
-activity = discord.Activity(name='with puzzles', type=discord.ActivityType.playing)
+activity = discord.Activity(name='with puzzles', type=discord.ActivityType.custom)
 client = MyClient(intents=intents, activity=activity)
 client.run(TOKEN)
 
