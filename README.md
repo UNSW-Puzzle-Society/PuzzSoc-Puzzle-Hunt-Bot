@@ -1,3 +1,3 @@
 # PuzzSoc-Puzzle-Hunt-Bot
-Discord Bot for UNSW Puzzle Society Puzzle Hunts
+Discord Bot for UNSW Puzzle Society Puzzle Hunts\n
 Written with the discord.py API wrapper
