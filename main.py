@@ -224,8 +224,8 @@ class MyClient(discord.Client):
                     await message.channel.send('Team not found! Make sure you type the team name exactly, case sensitive.')
 
             elif message.content == '!send':
-                sendchannel = client.get_channel(866295094864510986)
-                await sendchannel.send("<:haLove:819493073994252308>")
+                sendchannel = client.get_channel(861446005640003644)
+                await sendchannel.send("""<:haLove:895869737169469500>""")
 
             elif message.content == '!getpuzzles':
                 if hunt_started:
