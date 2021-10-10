@@ -7,11 +7,14 @@ import gspread
 import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
 # define the scope
-scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+
 # add credentials to the account
 creds = ServiceAccountCredentials.from_json_keyfile_name('.unsw-puzzle-hunt-bot.json', scope)
+
 # authorize the clientsheet
 gclient = gspread.authorize(creds)
+
 with open('.token', 'r') as f:
     TOKEN = f.read()
 
@@ -26,8 +29,8 @@ puzzle_links = ['https://cdn.discordapp.com/attachments/608260104906866717/87321
                 'https://cdn.discordapp.com/attachments/608260104906866717/873216550998507530/Nemos_New_Family.png']
 num_scoreboard = 15
 num_hints = 8
-CHANNEL_ID = 111111111111111111 # where updates get sent to BOT UPDATES
-CHANNEL_ID_2 = 111111111111111111 # where successes get sent to
+CHANNEL_ID = 111111111111111111    # where updates get sent to BOT UPDATES
+CHANNEL_ID_2 = 111111111111111111  # where successes get sent to
 metalink = "https://forms.gle/"
 
 hunt_started = 1
@@ -50,6 +53,7 @@ except:
     with open("teamlist.csv", "w") as f:
         f.write("teamid,teamname,user1,user2,user3,user4,solve1,solve2,solve3,solve4,solve5,hints\n")
 
+
 # updates a given field for a team
 def update_field(teamid, field, new):
     field_pos = {'teamid': 0, 'solve1': 6, 'solve2': 7, 'solve3': 8, 'solve4': 9, 'solve5': 10, 'hints': 11}
@@ -66,12 +70,14 @@ def update_field(teamid, field, new):
     os.remove('teamlist.csv')
     os.rename('updated_teamlist.csv', 'teamlist.csv')
 
+
 # returns a specific field for a specific team
 def get_field(teamid, field):
     with open('teamlist.csv', newline='') as users:
         for user in csv.DictReader(users):
             if int(user['teamid']) == teamid:
                 return user[field]
+
 
 # returns teamid from userid. Returns -1 if not in a teamlist.csv registered team
 def team_id(userid):
@@ -90,12 +96,19 @@ def check_score(teamid):
             x += 1
     return x
 
+
 # returns teamid from the team name
 def get_teamid(teamname):
     with open('teamlist.csv', newline='') as users:
         for user in csv.DictReader(users):
             if user['teamname'] == teamname:
                 return int(user['teamid'])
+
+
+# handles all google sheets interactions
+def sheets(keyword, **kwargs):
+    pass
+
 
 class MyClient(discord.Client):
     @staticmethod
@@ -149,6 +162,8 @@ class MyClient(discord.Client):
                         pass
                 except FileNotFoundError:
                     await message.channel.send('Registration form csv not found!')
+                finally:
+                    f.close()
 
                 with open("Registration Form (Responses) - Form Responses 1.csv", 'r', encoding="utf-8", newline='') as f:
                     j = 1

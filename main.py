@@ -17,9 +17,11 @@ puzzle_links = ['https://cdn.discordapp.com/attachments/608260104906866717/87321
                 'https://cdn.discordapp.com/attachments/608260104906866717/873216550998507530/Nemos_New_Family.png']
 num_scoreboard = 15
 num_hints = 8
-CHANNEL_ID = 111111111111111111 # where updates get sent to BOT UPDATES
-CHANNEL_ID_2 = 111111111111111111 # where successes get sent to
+CHANNEL_ID = 111111111111111111  # where updates get sent to BOT UPDATES
+CHANNEL_ID_2 = 111111111111111111  # where successes get sent to
 metalink = "https://forms.gle/"
+admin_password = ''  # password for admin commands
+responses_csv = "Registration Form (Responses) - Form Responses 1.csv"  # name of responses csv
 
 hunt_started = 1
 
@@ -41,6 +43,7 @@ except:
     with open("teamlist.csv", "w") as f:
         f.write("teamid,teamname,user1,user2,user3,user4,solve1,solve2,solve3,solve4,solve5,hints\n")
 
+
 # updates a given field for a team
 def update_field(teamid, field, new):
     field_pos = {'teamid': 0, 'solve1': 6, 'solve2': 7, 'solve3': 8, 'solve4': 9, 'solve5': 10, 'hints': 11}
@@ -57,12 +60,14 @@ def update_field(teamid, field, new):
     os.remove('teamlist.csv')
     os.rename('updated_teamlist.csv', 'teamlist.csv')
 
+
 # returns a specific field for a specific team
 def get_field(teamid, field):
     with open('teamlist.csv', newline='') as users:
         for user in csv.DictReader(users):
             if int(user['teamid']) == teamid:
                 return user[field]
+
 
 # returns teamid from userid. Returns -1 if not in a teamlist.csv registered team
 def team_id(userid):
@@ -81,12 +86,14 @@ def check_score(teamid):
             x += 1
     return x
 
+
 # returns teamid from the team name
 def get_teamid(teamname):
     with open('teamlist.csv', newline='') as users:
         for user in csv.DictReader(users):
             if user['teamname'] == teamname:
                 return int(user['teamid'])
+
 
 class MyClient(discord.Client):
     @staticmethod
@@ -99,7 +106,7 @@ class MyClient(discord.Client):
         global teamlist
         if message.author.id == self.user.id:
             return
-
+        print(f'{message.author.name} [{message.guild.name}/{message.channel.name}]: {message.content}')
         if message.content.startswith('!'):
             message_words = message.content.split()
             team = team_id(message.author.id)
@@ -118,8 +125,8 @@ class MyClient(discord.Client):
                                 inline=False)
                 await message.channel.send(embed=embed)
 
-            elif message.content == '!admin':
-                embed = discord.Embed(title="Admin Commandlist Page", color=0x000000)
+            elif message.content == '!admin'+admin_password:
+                embed = discord.Embed(title="Admin Commands", color=0x000000)
                 embed.add_field(name="!convert",
                                 value="Converts registration form to teamlist (leaves existing teams alone).",
                                 inline=False)
@@ -127,21 +134,25 @@ class MyClient(discord.Client):
                                 value="Gets the id of a user if they share a server with the bot.\nEg !getid puzzlemaster#1234",
                                 inline=False)
                 embed.add_field(name="!usedhint [team name]",
-                                value="Reduces hintcount of team by 1.\nEg !usedhint TSM gia",
+                                value="Reduces hint count of team by 1.\nEg !usedhint TSM gia",
                                 inline=False)
                 embed.add_field(name="!check [team name]",
                                 value="Shows progress and number of hints remaining.\nEg !check TSM gia",
                                 inline=False)
+                embed.add_field(name="!send",
+                                value="Sends message (change in bot code)",
+                                inline=False)
                 await message.channel.send(embed=embed)
 
             elif message.content == '!convert':
+
                 try:
-                    with open("Registration Form (Responses) - Form Responses 1.csv", "r") as f:
+                    with open(responses_csv, "r") as f:
                         pass
                 except FileNotFoundError:
                     await message.channel.send('Registration form csv not found!')
 
-                with open("Registration Form (Responses) - Form Responses 1.csv", 'r', encoding="utf-8", newline='') as f:
+                with open(responses_csv, 'r', encoding="utf-8", newline='') as f:
                     j = 1
                     for team in csv.DictReader(f):
                         ids = []
@@ -166,7 +177,7 @@ class MyClient(discord.Client):
                                     team_already_exists = True
                                     await message.channel.send('Team **' + team['Team Name'] + "** is already in teamlist.csv. No action taken for team.")
 
-                        if team_already_exists == False:
+                        if not team_already_exists:
                             with open('teamlist.csv', 'a', newline='') as teamlist:
                                 writer = csv.DictWriter(teamlist, fieldnames=['teamid', 'teamname', 'user1', 'user2',
                                                                               'user3', 'user4', 'solve1',
