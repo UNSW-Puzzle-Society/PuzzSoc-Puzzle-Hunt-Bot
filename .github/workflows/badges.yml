@@ -25,15 +25,19 @@ jobs:
         cd badges
         rm *
         cd ..
-    - name: Creating pylint badge
+    - name: Running pylint
       run: |
         pylint `ls -R | grep .py | xargs` | grep 'Your code has been rated at' | cut -d' ' -f 7 | cut -d'/' -f 1 > pylint.txt
+    - name: Creating pylint badge
+      run: |
         anybadge --value=$(cat pylint.txt) -f badges/pylint.svg -l pylint 2=red 4=orange 6=yellow 8=yellowgreen 10=green
-    - name: Run coverage
+    - name: Running coverage
       run: |
         coverage run -m pytest
+      continue-on-error: true
+    - name: Creating coverage badge
+      run: |
         coverage report | grep 'TOTAL' | tr -s " " | cut -d' ' -f 4 > coverage.txt
-        echo $(cat coverage.txt)
         anybadge --value=$(cat coverage.txt) -f badges/coverage.svg -l coverage 20=red 40=orange 60=yellow 80=yellowgreen 100=green
     - name: Upload badge
       uses: EndBug/add-and-commit@v7
