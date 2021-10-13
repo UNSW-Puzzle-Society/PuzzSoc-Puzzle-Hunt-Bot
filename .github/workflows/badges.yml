@@ -31,11 +31,15 @@ jobs:
         anybadge --value=$(cat pylint.txt) -f badges/pylint.svg -l pylint 2=red 4=orange 6=yellow 8=yellowgreen 10=green
     - name: Run coverage
       run: |
+        coverage run -m pytest
+        coverage run -m pytest | grep 'TOTAL'
+        coverage run -m pytest | grep 'TOTAL' | tr -s " "
+        coverage run -m pytest | grep 'TOTAL' | tr -s " " | cut -d' ' -f 4 
         coverage run -m pytest | grep 'TOTAL' | tr -s " " | cut -d' ' -f 4 > coverage.txt
         echo $(cat coverage.txt)
         anybadge --value=$(cat coverage.txt) -f badges/coverage.svg -l coverage
     - name: Upload badge
       uses: EndBug/add-and-commit@v7
       with:
-        message: 'update badge'
+        message: 'update badges'
         add: 'badges/*.svg'
