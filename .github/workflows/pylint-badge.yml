@@ -21,8 +21,8 @@ jobs:
     - name: Creating pylint badge
       run: |
         rm badges/pylint.svg
-        pylint `ls -R|grep .py|xargs` | grep 'Your code has been rated at' | cut -d' ' -f 7 > pylint.txt
-        anybadge --value=$(cat pylint.txt) -f badges/pylint.svg pylint
+        pylint `ls -R | grep .py | xargs` | grep 'Your code has been rated at' | cut -d' ' -f 7 | cut -d'/' -f 1 > pylint.txt
+        anybadge --value=$(cat pylint.txt) -f badges/pylint.svg -l pylint 2=red 4=orange 8=yellow 10=green
     - name: Upload badge
       uses: EndBug/add-and-commit@v7
       with:
