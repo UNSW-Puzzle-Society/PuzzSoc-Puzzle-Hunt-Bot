@@ -30,7 +30,7 @@ jobs:
         pylint `ls -R | grep .py | xargs` | grep 'Your code has been rated at' | cut -d' ' -f 7 | cut -d'/' -f 1 > pylint.txt
     - name: Creating pylint badge
       run: |
-        anybadge --value=$(cat pylint.txt) -f badges/pylint.svg -l pylint 2=red 4=orange 6=yellow 8=yellowgreen 10=green
+        anybadge --value=$(cat pylint.txt) -f badges/pylint.svg pylint
     - name: Running coverage
       run: |
         coverage run -m pytest
@@ -38,7 +38,7 @@ jobs:
     - name: Creating coverage badge
       run: |
         coverage report | grep 'TOTAL' | tr -s " " | cut -d' ' -f 4 | cut -d'%' -f 1 > coverage.txt
-        anybadge --value=$(cat coverage.txt) -f badges/coverage.svg -l 'coverage %' 20=red 40=orange 60=yellow 80=yellowgreen 100=green
+        anybadge --value=$(cat coverage.txt) -f badges/coverage.svg coverage
     - name: Upload badge
       uses: EndBug/add-and-commit@v7
       with:
