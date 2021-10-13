@@ -20,6 +20,7 @@ jobs:
         pip install pylint
     - name: Creating pylint badge
       run: |
+        rm badges/pylint.svg
         pylint `ls -R|grep .py|xargs` | grep 'Your code has been rated at' | cut -d' ' -f 7 > pylint.txt
         anybadge --value=$(cat pylint.txt) -f badges/pylint.svg pylint
     - name: Upload badge
