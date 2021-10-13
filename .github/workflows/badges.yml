@@ -1,4 +1,4 @@
-name: Pylint Badge
+name: Badges
 
 on: [push]
 
@@ -18,13 +18,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install anybadge
         pip install pylint
+        pip install pytest
+        pip install coverage
     - name: Creating pylint badge
       run: |
         rm badges/pylint.svg
         pylint `ls -R | grep .py | xargs` | grep 'Your code has been rated at' | cut -d' ' -f 7 | cut -d'/' -f 1 > pylint.txt
-        anybadge --value=$(cat pylint.txt) -f badges/pylint.svg -l pylint 2=red 4=orange 8=yellow 10=green
+        anybadge --value=$(cat pylint.txt) -f badges/pylint.svg -l pylint 2=red 4=orange 6=yellow 8=yellowgreen 10=green
+    - name: Run coverage
+      run: |
+        rm badges/coverage.svg
+        coverage run -m pytest | grep 'TOTAL' | cut -d' ' -f 4 > coverage.txt
+        anybadge --value=$(cat coverage.txt) -f badges/coverage.svg -l coverage
     - name: Upload badge
       uses: EndBug/add-and-commit@v7
       with:
         message: 'update badge'
-        add: 'badges/pylint.svg'
+        add: 'badges/*.svg'
