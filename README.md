@@ -1,4 +1,4 @@
-![pylint]https://raw.githubusercontent.com/UNSW-Puzzle-Society/PuzzSoc-Puzzle-Hunt-Bot/pylint-badge/badges/pylint.svg
+![pylint](./badges/pylint.svg)
 
 # PuzzSoc-Puzzle-Hunt-Bot
 
