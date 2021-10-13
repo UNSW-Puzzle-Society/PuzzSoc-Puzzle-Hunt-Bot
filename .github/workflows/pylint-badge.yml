@@ -22,7 +22,7 @@ jobs:
         pylint --rcfile=.pylintrc --output-format=text `ls -R|grep .py$|xargs` | tee pylint.txt
         anybadge --value=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' pylint.txt) --file=public/pylint.svg pylint
     - name: Archive pylint results
-        uses: actions/upload-artifact@v2
-        with:
-          name: pylint-badge
-          path: public/pylint.svg
+      uses: actions/upload-artifact@v2
+      with:
+        name: pylint-badge
+        path: public/pylint.svg
