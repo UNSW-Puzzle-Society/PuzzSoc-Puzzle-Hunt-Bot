@@ -32,10 +32,7 @@ jobs:
     - name: Run coverage
       run: |
         coverage run -m pytest
-        coverage run -m pytest | grep 'TOTAL'
-        coverage run -m pytest | grep 'TOTAL' | tr -s " "
-        coverage run -m pytest | grep 'TOTAL' | tr -s " " | cut -d' ' -f 4 
-        coverage run -m pytest | grep 'TOTAL' | tr -s " " | cut -d' ' -f 4 > coverage.txt
+        coverage report | grep 'TOTAL' | tr -s " " | cut -d' ' -f 4 > coverage.txt
         echo $(cat coverage.txt)
         anybadge --value=$(cat coverage.txt) -f badges/coverage.svg -l coverage
     - name: Upload badge
