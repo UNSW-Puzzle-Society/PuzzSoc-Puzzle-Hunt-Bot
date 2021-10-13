@@ -20,8 +20,8 @@ jobs:
         pip install pylint
     - name: Creating pylint badge
       run: |
-        pylint --rcfile=.pylintrc --output-format=text `ls -R|grep .py$|xargs` | tee pylint.txt
-        anybadge --value=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' pylint.txt) -f badges/pylint.svg pylint
+        pylint `ls -R|grep .py|xargs` | grep 'Your code has been rated at' | cut -d' ' -f 7 > pylint.txt
+        anybadge --value=$(cat pylint.txt) -f badges/pylint.svg pylint
     - name: Upload badge
       uses: EndBug/add-and-commit@v7
       with:
