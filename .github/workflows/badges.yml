@@ -37,8 +37,8 @@ jobs:
       continue-on-error: true
     - name: Creating coverage badge
       run: |
-        coverage report | grep 'TOTAL' | tr -s " " | cut -d' ' -f 4 > coverage.txt
-        anybadge --value=$(cat coverage.txt) -f badges/coverage.svg -l coverage 20=red 40=orange 60=yellow 80=yellowgreen 100=green
+        coverage report | grep 'TOTAL' | tr -s " " | cut -d' ' -f 4 | cut -d'%' -f 1 > coverage.txt
+        anybadge --value=$(cat coverage.txt) -f badges/coverage.svg -l 'coverage %' 20=red 40=orange 60=yellow 80=yellowgreen 100=green
     - name: Upload badge
       uses: EndBug/add-and-commit@v7
       with:
