@@ -1,4 +1,5 @@
-![pylint](./badges/pylint.svg)
+![pylint](./badges/pylint.svg) ![coverage](./badges/coverage.svg)
+
 # PuzzSoc-Puzzle-Hunt-Bot
 
 Discord Bot for UNSW Puzzle Society Puzzle Hunts
