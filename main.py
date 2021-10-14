@@ -1,7 +1,7 @@
 """
 josh write an module string here or something
 """
-
+import datetime
 import time
 import csv
 import os
@@ -18,7 +18,8 @@ puzzle_answers = [
     'caramelpies',
     'adventure',
     'eeniemeenieminiemo',
-    'class']
+    'class',
+    'metaanswer']
 puzzle_links = [
     'https://cdn.discordapp.com/attachments/'
     '608260104906866717/873216521072169010/Full_Speed_Ahead_.png',
@@ -30,17 +31,18 @@ puzzle_links = [
     '609363499705171969/873540148808282152/trashtowers.png',
     'https://cdn.discordapp.com/attachments/'
     '608260104906866717/873216550998507530/Nemos_New_Family.png',
+    'meta linkkkkk'
 ]
 NUM_SCOREBOARD = 15
 NUM_HINTS = 8
-CHANNEL_ID = 111111111111111111  # where updates get sent to BOT UPDATES
-CHANNEL_ID_2 = 111111111111111111  # where successes get sent to
-METALINK = "https://forms.gle/"
+CHANNEL_ID = 727145488125788270  # where updates get sent to BOT UPDATES
+CHANNEL_ID_2 = 727145488125788270  # where successes get sent to
+CHANNEL_ID_3 = 727145488125788270  # where meta successes get sent to
 ADMIN_PASSWORD = ''  # password for admin commands
 # name of responses csv
 RESPONSES_CSV = "Registration Form (Responses) - Form Responses 1.csv"
 
-HUNT_STARTED = 1
+HUNT_STARTED = True
 
 #########################################################################
 
@@ -65,6 +67,7 @@ try:  # initialising teamlist.csv creates/formats it if incorrect form
             'solve3',
             'solve4',
             'solve5',
+            'solve6',
                 'hints']:
             with open("teamlist.csv", "w", encoding="utf-8") as ff:
                 ff.write(
@@ -73,11 +76,35 @@ try:  # initialising teamlist.csv creates/formats it if incorrect form
 except BaseException:  # what is this supposed to be?
     with open("teamlist.csv", "w", encoding="utf-8") as f:
         f.write(
-            "teamid,teamname,user1,user2,user3,user4,solve1,solve2,solve3,solve4,solve5,hints\n")
+            "teamid,teamname,user1,user2,user3,user4,solve1,solve2,solve3,solve4,solve5,solve6,hints\n")
 
+try:  # initialising statistics.csv creates/formats it if incorrect form
+    with open("statistics.csv", "r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        if next(reader) != [
+            'teamid',
+            'attempts1',
+            'time1',
+            'attempts2',
+            'time2',
+            'attempts3',
+            'time3',
+            'attempts4',
+            'time4',
+            'attempts5',
+            'time5',
+            'attempts6',
+                'time6']:
+            with open("statistics.csv", "w", encoding="utf-8") as ff:
+                ff.write(
+                    "teamid,attempts1,time1,attempts2,time2,attempts3,time3,attempts4,time4,attempts5,time5,attempts6,time6\n")
+except BaseException:  # what is this supposed to be?
+    with open("statistics.csv", "w", encoding="utf-8") as f:
+        f.write(
+            "teamid,attempts1,time1,attempts2,time2,attempts3,time3,attempts4,time4,attempts5,time5,attempts6,time6\n")
 
 # updates a given field for a team
-def update_field(teamid, field, new):
+def update_field(teamid, field, new, filename):
     field_pos = {
         'teamid': 0,
         'solve1': 6,
@@ -85,9 +112,22 @@ def update_field(teamid, field, new):
         'solve3': 8,
         'solve4': 9,
         'solve5': 10,
-        'hints': 11}
-    with open('teamlist.csv', 'r', encoding="utf-8") as old_file, open(
-            'updated_teamlist.csv', 'w+', encoding="utf-8") as new_file:
+        'solve6': 11,
+        'hints': 12,
+        'attempts1': 1,
+        'time1': 2,
+        'attempts2': 3,
+        'time2': 4,
+        'attempts3': 5,
+        'time3': 6,
+        'attempts4': 7,
+        'time4': 8,
+        'attempts5': 9,
+        'time5': 10,
+        'attempts6': 11,
+        'time6': 12}
+    with open(filename, 'r', encoding="utf-8") as old_file, open(
+            'temporary_file.csv', 'w+', encoding="utf-8") as new_file:
         for row in old_file:
             row_content = row.split(',')
             if row_content[0] == str(teamid):
@@ -95,17 +135,17 @@ def update_field(teamid, field, new):
                 new_file.write(str(','.join(row_content)))
                 # to solve cap issue (no newline written when last field is
                 # updated)
-                if field == 'hints':
+                if field == 'hints' or field == 'solve6':
                     new_file.write("\n")
             else:
                 new_file.write(row)
-    os.remove('teamlist.csv')
-    os.rename('updated_teamlist.csv', 'teamlist.csv')
+    os.remove(filename)
+    os.rename('temporary_file.csv', filename)
 
 
 # returns a specific field for a specific team
-def get_field(teamid, field):
-    with open('teamlist.csv', newline='', encoding="utf-8") as users:
+def get_field(teamid, field, filename):
+    with open(filename, newline='', encoding="utf-8") as users:
         for user in csv.DictReader(users):
             if int(user['teamid']) == teamid:
                 return user[field]
@@ -126,7 +166,7 @@ def team_id(userid):
 def check_score(teamid):
     x = 0
     for i in range(5):
-        if get_field(teamid, 'solve{}'.format(str(i + 1))) == '1':
+        if get_field(teamid, 'solve{}'.format(str(i + 1)), "teamlist.csv") == '1':
             x += 1
     return x
 
@@ -137,6 +177,7 @@ def get_teamid(teamname):
         for user in csv.DictReader(users):
             if user['teamname'] == teamname:
                 return int(user['teamid'])
+    return -1
 
 
 class MyClient(discord.Client):
@@ -147,12 +188,13 @@ class MyClient(discord.Client):
 
     async def on_message(self, message):
         global teamlist
+        global HUNT_STARTED
         if message.author.id == self.user.id:
             return
-        print(
-            f'{message.author.name}',
-            f'[{message.guild.name}/{message.channel.name}]: {message.content}'
-        )
+        # print(
+        #     f'{message.author.name}',
+        #     f'[{message.guild.name}/{message.channel.name}]: {message.content}'
+        # )
         if message.content.startswith('!'):
             message_words = message.content.split()
             team = team_id(message.author.id)
@@ -161,7 +203,7 @@ class MyClient(discord.Client):
                 embed = discord.Embed(title="Help Page", color=0x000000)
                 embed.add_field(
                     name="!puzz[number] [answer]",
-                    value="Check the answer of your [number]th puzzle.\nEg !puzz1 sampleanswer",
+                    value=f"Check the answer of your [number]th puzzle. The meta is considered puzzle {len(puzzle_answers)}\nEg !puzz1 sampleanswer",
                     inline=False)
                 embed.add_field(
                     name="!getmeta",
@@ -203,9 +245,23 @@ class MyClient(discord.Client):
                 embed.add_field(name="!send",
                                 value="Sends message (change in bot code)",
                                 inline=False)
+                embed.add_field(name="!huntenable",
+                                value="activates hunt and !getpuzzles command",
+                                inline=False)
+                embed.add_field(name="!huntdisable",
+                                value="deactivates hunt and disables !getpuzzles command",
+                                inline=False)
                 await message.channel.send(embed=embed)
 
-            elif message.content == '!convert':
+            elif message.content == '!huntenable'+ ADMIN_PASSWORD:
+                HUNT_STARTED = True
+                await message.channel.send('Hunt enabled')
+
+            elif message.content == '!huntdisable'+ ADMIN_PASSWORD:
+                HUNT_STARTED = False
+                await message.channel.send('Hunt disabled')
+
+            elif message.content == '!convert'+ ADMIN_PASSWORD:
 
                 try:
                     with open(RESPONSES_CSV, "r", encoding="utf-8") as f:
@@ -262,6 +318,7 @@ class MyClient(discord.Client):
                                         'solve3',
                                         'solve4',
                                         'solve5',
+                                        'solve6',
                                         'hints'])
                                 writer.writerow({'teamid': j,
                                                  'teamname': team['Team Name'],
@@ -274,7 +331,40 @@ class MyClient(discord.Client):
                                                  'solve3': 0,
                                                  'solve4': 0,
                                                  'solve5': 0,
+                                                 'solve6': 0,
                                                  'hints': NUM_HINTS
+                                                 })
+                            with open(
+                                    'statistics.csv', 'a', newline='', encoding="utf-8") as statistics:
+                                writer = csv.DictWriter(
+                                    statistics,
+                                    fieldnames=[
+                                        'teamid',
+                                        'attempts1',
+                                        'time1',
+                                        'attempts2',
+                                        'time2',
+                                        'attempts3',
+                                        'time3',
+                                        'attempts4',
+                                        'time4',
+                                        'attempts5',
+                                        'time5',
+                                        'attempts6',
+                                        'time6'])
+                                writer.writerow({'teamid': j,
+                                                 'attempts1': 0,
+                                                 'time1': "NULL",
+                                                 'attempts2': 0,
+                                                 'time2': "NULL",
+                                                 'attempts3': 0,
+                                                 'time3': "NULL",
+                                                 'attempts4': 0,
+                                                 'time4': "NULL",
+                                                 'attempts5': 0,
+                                                 'time5': "NULL",
+                                                 'attempts6': 0,
+                                                 'time6': "NULL",
                                                  })
                         j += 1
 
@@ -285,52 +375,51 @@ class MyClient(discord.Client):
 
                 await message.channel.send('Teams loaded')
 
-            elif message_words[0] == '!check':
-                teamname = message.content[7:]
-                try:
-                    embed = discord.Embed(
-                        title="Team {} Progress".format(teamname), color=0x7289DA)
-                    embed.add_field(
-                        name='**  **1\t 2\t\u20093\t\u20094\t\u200A5',
-                        value=" ".join(
-                            [
-                                ':green_square:' if get_field(
-                                    get_teamid(teamname),
-                                    'solve{}'.format(
-                                        str(
-                                            i +
-                                            1))) == '1' else ":black_large_square:" for i in range(
-                                                5)]))
-                    embed.add_field(
-                        name="Hints",
-                        value="{} hints remaining.".format(
-                            get_field(
-                                get_teamid(teamname),
-                                "hints")),
-                        inline=False)
-                    await message.channel.send(embed=embed)
+            elif message_words[0] == '!check' + ADMIN_PASSWORD:
+                teamname = message.content[7 + len(ADMIN_PASSWORD):]
 
-                except TypeError:
+                if get_teamid(teamname) == -1:
                     await message.channel.send(
                         'Team not found! Make sure you type the team name exactly, case sensitive.')
+                else:
+                    try:
+                        embed = discord.Embed(
+                            title="Team {} Progress".format(teamname), color=0x7289DA)
+                        embed.add_field(
+                            name='**  **1\t 2\t\u20093\t\u20094\t\u200A5\tM',
+                            value=" ".join(
+                                [
+                                    ':green_square:' if get_field(get_teamid(teamname), 'solve{}'.format(str(i + 1)), "teamlist.csv") == '1' else ":black_large_square:" for i in range(6)]))
+                        embed.add_field(
+                            name="Hints",
+                            value="{} hints remaining.".format(
+                                get_field(
+                                    get_teamid(teamname),
+                                    "hints", "teamlist.csv")),
+                            inline=False)
+                        await message.channel.send(embed=embed)
 
-            elif message_words[0] == '!getid':
-                person = message.content[7:]
+                    except TypeError:
+                        await message.channel.send(
+                            'Team not found! Make sure you type the team name exactly, case sensitive.')
+
+            elif message_words[0] == '!getid' + ADMIN_PASSWORD:
+                person = message.content[7 + len(ADMIN_PASSWORD):]
                 x = discord.utils.get(client.get_all_members(), name="{}".format(
                     person[:-5]), discriminator="{}".format(person[-4:])).id
                 await message.channel.send(x)
 
-            elif message_words[0] == '!usedhint':
-                teamname = message.content[10:]
+            elif message_words[0] == '!usedhint' + ADMIN_PASSWORD:
+                teamname = message.content[10 + len(ADMIN_PASSWORD):]
                 try:
-                    hints = int(get_field(get_teamid(teamname), "hints"))
+                    hints = int(get_field(get_teamid(teamname), "hints", "teamlist.csv"))
                     if hints > 0:
                         update_field(
                             get_teamid(teamname), "hints", str(
-                                hints - 1))
+                                hints - 1), "teamlist.csv")
                         await message.channel.send(
                             'Team **{}** now has {} hints remaining.'.format(
-                                teamname, get_field(get_teamid(teamname), "hints")))
+                                teamname, get_field(get_teamid(teamname), "hints", "teamlist.csv")))
                     else:
                         await message.channel.send(
                             'ALERT: team **{}** already had 0 hints remaining!'.format(teamname))
@@ -338,20 +427,20 @@ class MyClient(discord.Client):
                     await message.channel.send(
                         'Team not found! Make sure you type the team name exactly, case sensitive.')
 
-            elif message.content == '!send':
+            elif message.content == '!send' + ADMIN_PASSWORD:
                 sendchannel = client.get_channel(861446005640003644)
                 await sendchannel.send("""<:haLove:895869737169469500>""")
 
             elif message.content == '!getpuzzles':
                 if HUNT_STARTED:
                     embed = discord.Embed(title="Puzzle List", color=0x000000)
-                    for i in range(len(puzzle_links)):
+                    for i in range(len(puzzle_links) - 1):
                         embed.add_field(name="Puzzle " + str(i + 1),
                                         value=puzzle_links[i],
                                         inline=False)
-                    if check_score(team) == 5:
-                        embed.add_field(name="Meta Puzzle",
-                                        value=METALINK,
+                    if check_score(team) >= 5:
+                        embed.add_field(name="Meta Puzzle (Puzzle 6)",
+                                        value=puzzle_links[len(puzzle_links) - 1],
                                         inline=False)
                     else:
                         embed.add_field(
@@ -367,17 +456,16 @@ class MyClient(discord.Client):
             elif message.content == '!top':
                 score_list = []
                 with open('teamlist.csv', newline='', encoding="utf-8") as f:
-                    for team in csv.DictReader(f):
-                        score = check_score(int(team["teamid"]))
+                    for teama in csv.DictReader(f):
+                        score = check_score(int(teama["teamid"]))
                         try:
                             score_list.append(
-                                [teamlist[team["teamid"]], score])
+                                [teamlist[teama["teamid"]], score, get_field(int(teama["teamid"]), 'time6', "statistics.csv")])
                         except KeyError:
-                            score_list.append([team["teamid"], score])
+                            score_list.append([teama["teamid"], score, get_field(int(teama["teamid"]), 'time6', "statistics.csv")])
 
-                # sorting list in decreasing order
-                score_list = sorted(score_list, key=itemgetter(1))
-                score_list = score_list[::-1]
+                # teams are first sorted by total score, then within the same scores, they are sorted by meta submission time
+                score_list = sorted(score_list, key=lambda x: (-x[1], x[2]))
 
                 displaylist = []
                 for i in range(0, NUM_SCOREBOARD):
@@ -389,7 +477,7 @@ class MyClient(discord.Client):
                     except IndexError:
                         pass
                 embed = discord.Embed(
-                    title="PixarHunt Top " +
+                    title="Trick or Treat Hunt Top " +
                     str(NUM_SCOREBOARD) +
                     " Leaderboard",
                     description="\n".join(displaylist),
@@ -406,17 +494,23 @@ class MyClient(discord.Client):
                     message.content = message.content.lower()
                     channel = client.get_channel(CHANNEL_ID)
                     channel2 = client.get_channel(CHANNEL_ID_2)
+                    channel3 = client.get_channel(CHANNEL_ID_3)
                     puzzle_no = message_words[0][-1]
-                    if puzzle_no not in '12345':
+                    if puzzle_no not in '123456':
                         await message.channel.send("Use !help to see how to use this bot.")
                         return
                     else:
                         puzzle_no = int(puzzle_no)
                     try:
+                        if get_field(team, 'solve{}'.format(str(puzzle_no)), "teamlist.csv") != "1":
+                            attempts = int(get_field(team, 'attempts{}'.format(str(puzzle_no)), "statistics.csv"))
+                            update_field(team, 'attempts{}'.format(str(puzzle_no)), str(attempts + 1), "statistics.csv")
+
+
                         if message.content[7:] == puzzle_answers[puzzle_no - 1]:
                             update_field(
                                 team, 'solve{}'.format(
-                                    str(puzzle_no)), 1)
+                                    str(puzzle_no)), 1, "teamlist.csv")
                             embed = discord.Embed(color=0x00ff00)
                             embed.add_field(name="Correct!",
                                             value="Your answer to puzzle {} is correct!\n"
@@ -432,16 +526,26 @@ class MyClient(discord.Client):
                                 f"<t:{int(time.time())}> Team **{teamlist[str(team)]}** "
                                 f"solved puzzle {puzzle_no} with answer "
                                 f"'**{message.content[7:]}**'!")
+                            if puzzle_no == 6:
+                                await channel3.send(
+                                    f"<t:{int(time.time())}> Team **{teamlist[str(team)]}** "
+                                    f"solved puzzle the META with answer "
+                                    f"'**{message.content[7:]}**'!")
+
                             if check_score(team) == 5:
                                 await message.channel.send(
                                     "Congratulations on solving all 5 puzzles! "
-                                    "Here's the meta!\n" + METALINK)
+                                    "Here's the meta!\n" + puzzle_links[5])
                                 await channel.send(
                                     f"<t:{int(time.time())}> "
                                     f"Team **{teamlist[str(team)]}** has reached the meta!")
                                 await channel2.send(
                                     f"<t:{int(time.time())}> "
                                     f"Team **{teamlist[str(team)]}** has reached the meta!")
+
+                            if get_field(team, 'time{}'.format(str(puzzle_no)), "statistics.csv") == "NULL":
+                                update_field(team, 'time{}'.format(str(puzzle_no)), datetime.datetime.now().strftime("%c"), "statistics.csv")
+
                         else:
                             embed = discord.Embed(color=0xff0000)
                             embed.add_field(
@@ -467,25 +571,20 @@ class MyClient(discord.Client):
                         title="Team {} Progress".format(
                             get_field(
                                 team,
-                                'teamname')),
+                                'teamname', "teamlist.csv")),
                         color=0x7289DA)
                     embed.add_field(
-                        name='**  **1\t 2\t\u20093\t\u20094\t\u200A5',
+                        name='**  **1\t 2\t\u20093\t\u20094\t\u200A5\tM',
                         value=" ".join(
                             [
-                                ':green_square:' if get_field(
-                                    team,
-                                    'solve{}'.format(
-                                        str(
-                                            i +
-                                            1))) == '1' else ":black_large_square:" for i in range(
-                                                5)]))
+                                ':green_square:' if get_field(team, 'solve{}'.format(str(i + 1)), "teamlist.csv") == '1' else ":black_large_square:" for i in range(6)]))
+
                     embed.add_field(
                         name="Hints",
                         value="{} hints remaining.".format(
                             get_field(
                                 team,
-                                "hints")),
+                                "hints", "teamlist.csv")),
                         inline=False)
                     await message.channel.send(embed=embed)
 
@@ -496,10 +595,14 @@ class MyClient(discord.Client):
                         'If you think this is an error, contact a PuzzleSoc Exec.')
                 else:
                     x = check_score(team)
-                    if x == 5:
-                        await message.channel.send("Congratulations! "
-                                                   "Here's the meta! "
-                                                   "<:v2:870586401018753044>\n" + METALINK)
+                    if x >= 5:
+                        embed = discord.Embed(color=0xa2f9ff)
+                        embed.add_field(name="Meta",
+                                        value="Congratulations! Here's the meta! Remember to submit your meta answer with !puzz6 [answer]\n"
+                                              "<:v2:870586401018753044>\n" + puzzle_links[5],
+                                        inline=False)
+                        await message.channel.send(embed=embed)
+
                     else:
                         await message.channel.send("You still have {} puzzle{} to go.".format(
                             5 - x, "" if x == 4 else "s"))
@@ -509,8 +612,6 @@ class MyClient(discord.Client):
 
 
 intents = discord.Intents().all()
-activity = discord.Activity(
-    name='with puzzles',
-    type=discord.ActivityType.custom)
+activity = discord.Activity(name='with puzzles', type=discord.ActivityType.playing)
 client = MyClient(intents=intents, activity=activity)
 client.run(TOKEN)
