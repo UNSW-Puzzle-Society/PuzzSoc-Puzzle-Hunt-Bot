@@ -427,11 +427,9 @@ class MyClient(discord.Client):
                         await message.channel.send(
                             'ALERT: team **{}** already had 0 hints remaining!'.format(teamname))
 
-            elif message.content.startswith('!send' + ADMIN_PASSWORD):
-                content = message.content.split(" ", 2)
-                send_channel = client.get_channel(int(content[1]))
-                print(content[2])
-                await send_channel.send(content[2])
+            elif message.content == '!send' + ADMIN_PASSWORD:
+                sendchannel = client.get_channel(866295094864510986)
+                await sendchannel.send("""Hi! I’m <@866265168802611201>""")
 
             elif message.content == '!getpuzzles':
                 if HUNT_STARTED:
