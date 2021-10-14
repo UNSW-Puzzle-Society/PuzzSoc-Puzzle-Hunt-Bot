@@ -131,3 +131,6 @@ dmypy.json
 # token
 .token
 .unsw-puzzle-hunt-bot.json
+
+# intellij configs
+.idea/
