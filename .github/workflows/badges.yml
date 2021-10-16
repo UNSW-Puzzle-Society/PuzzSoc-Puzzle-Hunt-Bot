@@ -1,6 +1,6 @@
 name: Badges
 
-on: [push]
+on: [pull_request]
 
 jobs:
   build:
