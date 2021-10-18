@@ -22,8 +22,9 @@ jobs:
         pip install coverage
     - name: Removing old badges
       run: |
+        mkdir -p badges
         cd badges
-        rm *
+        rm -rf *
         cd ..
     - name: Running pylint
       run: |
