@@ -22,6 +22,7 @@ jobs:
         pip install coverage
     - name: Removing old badges
       run: |
+        mkdir -p badges
         cd badges
         rm *
         cd ..
