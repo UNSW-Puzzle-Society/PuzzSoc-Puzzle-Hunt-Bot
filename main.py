@@ -33,14 +33,14 @@ puzzle_links = [
     '608260104906866717/873216550998507530/Nemos_New_Family.png',
     'meta linkkkkk'
 ]
-NUM_SCOREBOARD = 15
-NUM_HINTS = 8
+NUM_SCOREBOARD = 40
+NUM_HINTS = 5
 CHANNEL_ID = 727145488125788270  # where updates get sent to BOT UPDATES
 CHANNEL_ID_2 = 727145488125788270  # where successes get sent to
 CHANNEL_ID_3 = 727145488125788270  # where meta successes get sent to
 ADMIN_PASSWORD = ''  # password for admin commands
 # name of responses csv
-RESPONSES_CSV = "Registration Form (Responses) - Form Responses 1.csv"
+RESPONSES_CSV = "EcoSoc x PuzzleSoc_ [event name] (Responses) - Form Responses 1.csv"
 
 HUNT_STARTED = True
 
@@ -274,11 +274,11 @@ class MyClient(discord.Client):
                     for team in csv.DictReader(f):
                         ids = []
                         for i in range(1, 5):
-                            if i == 1:
-                                person = team[
-                                    f"Team member {str(i)}'s Discord#ID (eg PuzzleMaster#1234)"]
-                            else:
-                                person = team[f"Team member {str(i)}'s Discord#ID"]
+                            # if i == 1:
+                            #     person = team[
+                            #         f"Team member {str(i)}'s Discord#ID (eg PuzzleMaster#1234)"]
+                            # else:
+                            person = team[f"Discord Name and Number {str(i)}"]
                             try:
                                 ids.append(
                                     discord.utils.get(client.get_all_members(), name="{}".format(
@@ -428,8 +428,8 @@ class MyClient(discord.Client):
                         'Team not found! Make sure you type the team name exactly, case sensitive.')
 
             elif message.content == '!send' + ADMIN_PASSWORD:
-                sendchannel = client.get_channel(861446005640003644)
-                await sendchannel.send("""<:haLove:895869737169469500>""")
+                sendchannel = client.get_channel(503533739104665632)
+                await sendchannel.send("""happy birthday chwip <3""")
 
             elif message.content == '!getpuzzles':
                 if HUNT_STARTED:
