@@ -24,7 +24,7 @@ jobs:
       run: |
         mkdir -p badges
         cd badges
-        rm *
+        rm -rf *
         cd ..
     - name: Running pylint
       run: |
