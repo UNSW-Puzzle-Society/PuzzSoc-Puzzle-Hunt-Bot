@@ -1,11 +1,13 @@
 """
 josh write an module string here or something
 """
-import datetime
-import time
 import csv
+import datetime
 import os
+import time
+
 import discord
+
 with open('.token', 'r', encoding="utf-8") as f:
     TOKEN = f.read()
 
@@ -67,7 +69,7 @@ try:  # initialising teamlist.csv creates/formats it if incorrect form
             'solve4',
             'solve5',
             'solve6',
-                'hints']:
+            'hints']:
             with open("teamlist.csv", "w", encoding="utf-8") as ff:
                 ff.write(
                     "teamid,teamname,"
@@ -95,7 +97,7 @@ try:  # initialising statistics.csv creates/formats it if incorrect form
             'attempts5',
             'time5',
             'attempts6',
-                'time6']:
+            'time6']:
             with open("statistics.csv", "w", encoding="utf-8") as ff:
                 ff.write(
                     "teamid,attempts1,time1,attempts2,time2,attempts3,time3,"
@@ -216,7 +218,7 @@ class MyClient(discord.Client):
                 embed.add_field(
                     name="!puzz[number] [answer]",
                     value="Check the answer of your [number]th puzzle. The meta is considered "
-                        f"puzzle {len(puzzle_answers)}\nEg !puzz1 sampleanswer",
+                          f"puzzle {len(puzzle_answers)}\nEg !puzz1 sampleanswer",
                     inline=False)
                 embed.add_field(
                     name="!getmeta",
@@ -245,7 +247,7 @@ class MyClient(discord.Client):
                 embed.add_field(
                     name="!getid [user tag]",
                     value="Gets the id of a user if they share a server with the bot.\n"
-                    "Eg !getid puzzlemaster#1234",
+                          "Eg !getid puzzlemaster#1234",
                     inline=False)
                 embed.add_field(
                     name="!usedhint [team name]",
@@ -315,7 +317,7 @@ class MyClient(discord.Client):
                                     team_already_exists = True
                                     await message.channel.send('Team **' + team[
                                         'Team Name'] + "** is already in teamlist.csv. "
-                                        "No action taken for team.")
+                                                       "No action taken for team.")
 
                         if not team_already_exists:
                             with open(
@@ -355,7 +357,7 @@ class MyClient(discord.Client):
                                     'a',
                                     newline='',
                                     encoding="utf-8",
-                                ) as statistics:
+                            ) as statistics:
                                 writer = csv.DictWriter(
                                     statistics,
                                     fieldnames=[
@@ -417,8 +419,8 @@ class MyClient(discord.Client):
                         )
                         embed.add_field(
                             name="Hints",
-                            value=f"""{get_field(get_teamid(teamname),"hints","teamlist.csv")} """
-                            "hints remaining.",
+                            value=f"""{get_field(get_teamid(teamname), "hints", "teamlist.csv")} """
+                                  "hints remaining.",
                             inline=False)
                         await message.channel.send(embed=embed)
 
@@ -456,245 +458,245 @@ class MyClient(discord.Client):
                             'ALERT: team **{teamname}** already had 0 hints remaining!'
                         )
                 except TypeError:
-                    await message.channel.send(
-                        'Team not found! Make sure you type the team name exactly, case sensitive.'
-                    )
+                await message.channel.send(
+                    'Team not found! Make sure you type the team name exactly, case sensitive.'
+                )
 
-            elif message.content == '!send' + ADMIN_PASSWORD:
-                sendchannel = client.get_channel(503533739104665632)
-                await sendchannel.send("""happy birthday chwip <3""")
+        elif message.content == '!send' + ADMIN_PASSWORD:
+            sendchannel = client.get_channel(503533739104665632)
+            await sendchannel.send("""happy birthday chwip <3""")
 
-            elif message.content == '!getpuzzles':
-                if HUNT_STARTED:
-                    embed = discord.Embed(title="Puzzle List", color=0x5865F2)
-                    for i in range(len(puzzle_links) - 1):
-                        embed.add_field(name="Puzzle " + str(i + 1),
-                                        value=puzzle_links[i],
-                                        inline=False)
-                    if check_score(team) >= 5:
-                        embed.add_field(name="Meta Puzzle (Puzzle 6)",
-                                        value=puzzle_links[len(puzzle_links) - 1],
-                                        inline=False)
-                    else:
-                        embed.add_field(
-                            name="Meta Puzzle",
-                            value="Unlocks once all 5 puzzles have been correctly submitted.",
-                            inline=False)
-                    await message.channel.send(embed=embed)
+        elif message.content == '!getpuzzles':
+            if HUNT_STARTED:
+                embed = discord.Embed(title="Puzzle List", color=0x5865F2)
+                for i in range(len(puzzle_links) - 1):
+                    embed.add_field(name="Puzzle " + str(i + 1),
+                                    value=puzzle_links[i],
+                                    inline=False)
+                if check_score(team) >= 5:
+                    embed.add_field(name="Meta Puzzle (Puzzle 6)",
+                                    value=puzzle_links[len(puzzle_links) - 1],
+                                    inline=False)
                 else:
-                    await message.channel.send(
-                        'The hunt has not commenced yet! '
-                        'The !getpuzzles command will activate soon!')
-
-            elif message.content == '!top':
-                score_list = []
-                with open('teamlist.csv', newline='', encoding="utf-8") as f:
-                    for teama in csv.DictReader(f):
-                        score = check_score(int(teama["teamid"]))
-                        try:
-                            score_list.append(
-                                [
-                                    teamlist[teama["teamid"]],
-                                    score,
-                                    get_field(int(teama["teamid"]), 'time6', "statistics.csv"),
-                                ]
-                            )
-                        except KeyError:
-                            score_list.append(
-                                [
-                                    teama["teamid"],
-                                    score,
-                                    get_field(int(teama["teamid"]), 'time6', "statistics.csv")
-                                ]
-                            )
-
-                # teams are first sorted by total score, then within the same scores,
-                # they are sorted by meta submission time
-                score_list = sorted(score_list, key=lambda x: (-x[1], x[2]))
-
-                display_list = []
-                for i in range(0, NUM_SCOREBOARD):
-                    try:
-                        displaylist.append(
-                            f"{str(i + 1)}. Team **{score_list[i][0]}** with "
-                            f"**{score_list[i][1]}** puzzle"
-                            f"""{"" if score_list[i][1] == 1 else "s"} completed."""
-                        )
-                    except IndexError:  # there should be a better way than try/except
-                        pass
-                embed = discord.Embed(
-                    title="Trick or Treat Hunt Top " +
-                    str(NUM_SCOREBOARD) +
-                    " Leaderboard",
-                    description="\n".join(display_list),
-                    color=0xffa500)
-
-                await message.channel.send(embed=embed)
-
-            elif message.content.startswith('!puzz'):
-                if team == -1:
-                    await message.channel.send(
-                        'Sorry, you are not registered. '
-                        'If you think this is an error, contact a PuzzleSoc Exec.')
-                else:
-                    message.content = message.content.lower()
-                    channel = client.get_channel(CHANNEL_ID)
-                    channel2 = client.get_channel(CHANNEL_ID_2)
-                    channel3 = client.get_channel(CHANNEL_ID_3)
-                    puzzle_no = message_words[0][-1]
-                    answer_attempt = message.content.split(' ', 1)[1]
-                    if puzzle_no not in ['1', '2', '3', '4', '5', '6']:
-                        await message.channel.send("Use !help to see how to use this bot.")
-                        return
-                    puzzle_no = int(puzzle_no)
-                    try:
-                        if get_field(
-                            team, f'solve{puzzle_no}', "teamlist.csv"
-                        ) != "1":
-                            attempts = int(
-                                get_field(
-                                    team,
-                                    'attempts{puzzle_no}',
-                                    "statistics.csv",
-                                )
-                            )
-                            update_field(
-                                team,
-                                'attempts{puzzle_no}',
-                                str(attempts + 1),
-                                "statistics.csv",
-                            )
-
-                        if answer_attempt == puzzle_answers[puzzle_no - 1]:
-                            update_field(
-                                team,
-                                f"solve{puzzle_no}",
-                                1,
-                                "teamlist.csv",
-                            )
-                            embed = discord.Embed(color=0x00ff00)
-                            embed.add_field(
-                                name="Correct!",
-                                value=f"Your answer to puzzle {puzzle_no} is correct!\n"
-                                        f"Puzzle solved for **{teamlist[str(team)]}**.",
-                                inline=False
-                            )
-                            await message.channel.send(embed=embed)
-                            await channel.send(
-                                f"<t:{int(time.time())}> "
-                                f"Team **{teamlist[str(team)]}** solved puzzle "
-                                f"{puzzle_no} with answer "
-                                f"'**{message.content[7:]}**'!"
-                            )
-                            await channel2.send(
-                                f"<t:{int(time.time())}> Team **{teamlist[str(team)]}** "
-                                f"solved puzzle {puzzle_no} with answer "
-                                f"'**{message.content[7:]}**'!"
-                            )
-                            if puzzle_no == 6:
-                                await channel3.send(
-                                    f"<t:{int(time.time())}> Team **{teamlist[str(team)]}** "
-                                    f"solved puzzle the META with answer "
-                                    f"'**{message.content[7:]}**'!"
-                                )
-
-                            if check_score(team) == 5:
-                                await message.channel.send(
-                                    "Congratulations on solving all 5 puzzles! "
-                                    "Here's the meta!\n" + puzzle_links[5])
-                                await channel.send(
-                                    f"<t:{int(time.time())}> "
-                                    f"Team **{teamlist[str(team)]}** has reached the meta!"
-                                )
-                                await channel2.send(
-                                    f"<t:{int(time.time())}> "
-                                    f"Team **{teamlist[str(team)]}** has reached the meta!"
-                                )
-
-                            if get_field(
-                                team,
-                                f"time{puzzle_no}",
-                                "statistics.csv",
-                            ) == "NULL":
-                                update_field(
-                                    team,
-                                    "time{puzzle_no}",
-                                    datetime.datetime.now().strftime("%c"),
-                                    "statistics.csv"
-                                )
-
-                        else:
-                            embed = discord.Embed(color=0xff0000)
-                            embed.add_field(
-                                name="Incorrect.",
-                                value=f"Your answer to puzzle {puzzle_no} is incorrect.",
-                                inline=False
-                            )
-                            await message.channel.send(embed=embed)
-                            await channel.send(
-                                f"<t:{int(time.time())}> "
-                                f"Team **{teamlist[str(team)]}** "
-                                "has incorrectly attempted puzzle "
-                                f"{puzzle_no} with answer "
-                                f"'**{message.content[7:]}**'."
-                            )
-                    except IndexError:
-                        await message.channel.send("Use !help to see how to use this bot.")
-
-            elif message.content == '!progress':
-                if team == -1:
-                    await message.channel.send(
-                        'Sorry, you are not registered. '
-                        'If you think this is an error, contact a PuzzleSoc Exec.')
-                else:
-                    embed = discord.Embed(
-                        title=f"""Team {get_field(team, 'teamname', "teamlist.csv")} Progress""",
-                        color=0x7289DA,
-                    )
                     embed.add_field(
-                        name='**  **1\t 2\t\u20093\t\u20094\t\u200A5\u2005\u2005\u2005M',
-                        value=" ".join(
+                        name="Meta Puzzle",
+                        value="Unlocks once all 5 puzzles have been correctly submitted.",
+                        inline=False)
+                await message.channel.send(embed=embed)
+            else:
+                await message.channel.send(
+                    'The hunt has not commenced yet! '
+                    'The !getpuzzles command will activate soon!')
+
+        elif message.content == '!top':
+            score_list = []
+            with open('teamlist.csv', newline='', encoding="utf-8") as f:
+                for teama in csv.DictReader(f):
+                    score = check_score(int(teama["teamid"]))
+                    try:
+                        score_list.append(
                             [
-                                ':green_square:' if get_field(
-                                    team, f"solve{i + 1}", "teamlist.csv"
-                                ) == '1' else ":black_large_square:" for i in range(6)
+                                teamlist[teama["teamid"]],
+                                score,
+                                get_field(int(teama["teamid"]), 'time6', "statistics.csv"),
                             ]
                         )
-                    )
+                    except KeyError:
+                        score_list.append(
+                            [
+                                teama["teamid"],
+                                score,
+                                get_field(int(teama["teamid"]), 'time6', "statistics.csv")
+                            ]
+                        )
 
-                    embed.add_field(
-                        name="Hints",
-                        value=f"""{get_field(team, "hints", "teamlist.csv")} hints remaining.""",
-                        inline=False,
-                    )
-                    await message.channel.send(embed=embed)
+            # teams are first sorted by total score, then within the same scores,
+            # they are sorted by meta submission time
+            score_list = sorted(score_list, key=lambda x: (-x[1], x[2]))
 
-            elif message.content == '!getmeta':
-                if team == -1:
-                    await message.channel.send(
-                        'Sorry, you are not registered. '
-                        'If you think this is an error, contact a PuzzleSoc Exec.'
+            display_list = []
+            for i in range(0, NUM_SCOREBOARD):
+                try:
+                    displaylist.append(
+                        f"{str(i + 1)}. Team **{score_list[i][0]}** with "
+                        f"**{score_list[i][1]}** puzzle"
+                        f"""{"" if score_list[i][1] == 1 else "s"} completed."""
                     )
-                else:
-                    x = check_score(team)
-                    if x == 5:
-                        embed = discord.Embed(color=0xa2f9ff)
+                except IndexError:  # there should be a better way than try/except
+                    pass
+            embed = discord.Embed(
+                title="Trick or Treat Hunt Top " +
+                      str(NUM_SCOREBOARD) +
+                      " Leaderboard",
+                description="\n".join(display_list),
+                color=0xffa500)
+
+            await message.channel.send(embed=embed)
+
+        elif message.content.startswith('!puzz'):
+            if team == -1:
+                await message.channel.send(
+                    'Sorry, you are not registered. '
+                    'If you think this is an error, contact a PuzzleSoc Exec.')
+            else:
+                message.content = message.content.lower()
+                channel = client.get_channel(CHANNEL_ID)
+                channel2 = client.get_channel(CHANNEL_ID_2)
+                channel3 = client.get_channel(CHANNEL_ID_3)
+                puzzle_no = message_words[0][-1]
+                answer_attempt = message.content.split(' ', 1)[1]
+                if puzzle_no not in ['1', '2', '3', '4', '5', '6']:
+                    await message.channel.send("Use !help to see how to use this bot.")
+                    return
+                puzzle_no = int(puzzle_no)
+                try:
+                    if get_field(
+                            team, f'solve{puzzle_no}', "teamlist.csv"
+                    ) != "1":
+                        attempts = int(
+                            get_field(
+                                team,
+                                'attempts{puzzle_no}',
+                                "statistics.csv",
+                            )
+                        )
+                        update_field(
+                            team,
+                            'attempts{puzzle_no}',
+                            str(attempts + 1),
+                            "statistics.csv",
+                        )
+
+                    if answer_attempt == puzzle_answers[puzzle_no - 1]:
+                        update_field(
+                            team,
+                            f"solve{puzzle_no}",
+                            1,
+                            "teamlist.csv",
+                        )
+                        embed = discord.Embed(color=0x00ff00)
                         embed.add_field(
-                            name="Meta",
-                            value="Congratulations! Here's the meta! "
-                            "Remember to submit your meta answer with !puzz6 [answer]\n"
-                            f"<:v2:870586401018753044>\n{puzzle_links[5]}",
+                            name="Correct!",
+                            value=f"Your answer to puzzle {puzzle_no} is correct!\n"
+                                  f"Puzzle solved for **{teamlist[str(team)]}**.",
                             inline=False
                         )
                         await message.channel.send(embed=embed)
+                        await channel.send(
+                            f"<t:{int(time.time())}> "
+                            f"Team **{teamlist[str(team)]}** solved puzzle "
+                            f"{puzzle_no} with answer "
+                            f"'**{message.content[7:]}**'!"
+                        )
+                        await channel2.send(
+                            f"<t:{int(time.time())}> Team **{teamlist[str(team)]}** "
+                            f"solved puzzle {puzzle_no} with answer "
+                            f"'**{message.content[7:]}**'!"
+                        )
+                        if puzzle_no == 6:
+                            await channel3.send(
+                                f"<t:{int(time.time())}> Team **{teamlist[str(team)]}** "
+                                f"solved puzzle the META with answer "
+                                f"'**{message.content[7:]}**'!"
+                            )
+
+                        if check_score(team) == 5:
+                            await message.channel.send(
+                                "Congratulations on solving all 5 puzzles! "
+                                "Here's the meta!\n" + puzzle_links[5])
+                            await channel.send(
+                                f"<t:{int(time.time())}> "
+                                f"Team **{teamlist[str(team)]}** has reached the meta!"
+                            )
+                            await channel2.send(
+                                f"<t:{int(time.time())}> "
+                                f"Team **{teamlist[str(team)]}** has reached the meta!"
+                            )
+
+                        if get_field(
+                                team,
+                                f"time{puzzle_no}",
+                                "statistics.csv",
+                        ) == "NULL":
+                            update_field(
+                                team,
+                                "time{puzzle_no}",
+                                datetime.datetime.now().strftime("%c"),
+                                "statistics.csv"
+                            )
 
                     else:
-                        await message.channel.send(
-                            f"""You still have {5 - x} puzzle{"" if x == 4 else "s"} to go."""
+                        embed = discord.Embed(color=0xff0000)
+                        embed.add_field(
+                            name="Incorrect.",
+                            value=f"Your answer to puzzle {puzzle_no} is incorrect.",
+                            inline=False
                         )
+                        await message.channel.send(embed=embed)
+                        await channel.send(
+                            f"<t:{int(time.time())}> "
+                            f"Team **{teamlist[str(team)]}** "
+                            "has incorrectly attempted puzzle "
+                            f"{puzzle_no} with answer "
+                            f"'**{message.content[7:]}**'."
+                        )
+                except IndexError:
+                    await message.channel.send("Use !help to see how to use this bot.")
 
+        elif message.content == '!progress':
+            if team == -1:
+                await message.channel.send(
+                    'Sorry, you are not registered. '
+                    'If you think this is an error, contact a PuzzleSoc Exec.')
             else:
-                await message.channel.send("Use !help to see how to use this bot.")
+                embed = discord.Embed(
+                    title=f"""Team {get_field(team, 'teamname', "teamlist.csv")} Progress""",
+                    color=0x7289DA,
+                )
+                embed.add_field(
+                    name='**  **1\t 2\t\u20093\t\u20094\t\u200A5\u2005\u2005\u2005M',
+                    value=" ".join(
+                        [
+                            ':green_square:' if get_field(
+                                team, f"solve{i + 1}", "teamlist.csv"
+                            ) == '1' else ":black_large_square:" for i in range(6)
+                        ]
+                    )
+                )
+
+                embed.add_field(
+                    name="Hints",
+                    value=f"""{get_field(team, "hints", "teamlist.csv")} hints remaining.""",
+                    inline=False,
+                )
+                await message.channel.send(embed=embed)
+
+        elif message.content == '!getmeta':
+            if team == -1:
+                await message.channel.send(
+                    'Sorry, you are not registered. '
+                    'If you think this is an error, contact a PuzzleSoc Exec.'
+                )
+            else:
+                x = check_score(team)
+                if x == 5:
+                    embed = discord.Embed(color=0xa2f9ff)
+                    embed.add_field(
+                        name="Meta",
+                        value="Congratulations! Here's the meta! "
+                              "Remember to submit your meta answer with !puzz6 [answer]\n"
+                              f"<:v2:870586401018753044>\n{puzzle_links[5]}",
+                        inline=False
+                    )
+                    await message.channel.send(embed=embed)
+
+                else:
+                    await message.channel.send(
+                        f"""You still have {5 - x} puzzle{"" if x == 4 else "s"} to go."""
+                    )
+
+        else:
+            await message.channel.send("Use !help to see how to use this bot.")
 
 
 intents = discord.Intents().all()

@@ -1,10 +1,11 @@
-import discord
 import csv
-import os
 import datetime
-from dateutil import parser
-from random import randint
+import os
 from operator import itemgetter
+from random import randint
+
+import discord
+from dateutil import parser
 
 
 def read_token():
@@ -71,11 +72,17 @@ class MyClient(discord.Client):
                                 change_file(message.author.id, 'state', 'infected')
                                 change_file(message.author.id, 'immunity', 0)
                                 change_file(message.author.id, 'usage', 0)
-                                embed = discord.Embed(title="Infected!", description='**' + message.author.name + "** hit a trigger word: **" + word + '**. \n **' + message.author.name + "**'s immunity was not strong enough. \nA new list of 20 words will now be generated.", color=0xff0000)
+                                embed = discord.Embed(title="Infected!",
+                                                      description='**' + message.author.name + "** hit a trigger word: **" + word + '**. \n **' + message.author.name + "**'s immunity was not strong enough. \nA new list of 20 words will now be generated.",
+                                                      color=0xff0000)
                                 generate_words(20)
                                 await message.channel.send('{0.author.mention}'.format(message), embed=embed)
                             else:
-                                embed = discord.Embed(title="Close Call!", description='**' + message.author.name + "** hit a trigger word: **" + word + '**. \n **' + message.author.name + "**'s " + str(check_user(message.author.id, 'immunity')) + "% immunity protected them from infection, for now... \nA new list of 20 words will now be generated.", color=0x00ff00)
+                                embed = discord.Embed(title="Close Call!",
+                                                      description='**' + message.author.name + "** hit a trigger word: **" + word + '**. \n **' + message.author.name + "**'s " + str(
+                                                          check_user(message.author.id,
+                                                                     'immunity')) + "% immunity protected them from infection, for now... \nA new list of 20 words will now be generated.",
+                                                      color=0x00ff00)
                                 await message.channel.send('{0.author.mention}'.format(message), embed=embed)
                                 generate_words(20)
                                 change_file(message.author.id, 'usage', int(check_user(message.author.id, 'usage')) - 1)
@@ -100,7 +107,8 @@ class MyClient(discord.Client):
                 embed.add_field(name="*pay [user] [amount]", value="Transfer nCoV-Bucks to target user.", inline=False)
                 embed.add_field(name="*shop", value="Buy items using nCoV-Bucks.", inline=False)
                 embed.add_field(name="*buy [item no]", value="Buys item from shop.", inline=False)
-                embed.add_field(name="*coughon [user]", value="Use a cough to pass on your infection to a target user.", inline=False)
+                embed.add_field(name="*coughon [user]", value="Use a cough to pass on your infection to a target user.",
+                                inline=False)
                 embed.add_field(name="*support", value="Contact support.", inline=False)
                 await message.channel.send('{0.author.mention}'.format(message), embed=embed)
 
@@ -111,7 +119,8 @@ class MyClient(discord.Client):
                     color = 0xff0000
                 member = str(message.guild.get_member(message.author.id))
                 embed = discord.Embed(title="Balance (" + member + ")", color=color)
-                embed.add_field(name="nCoV-Bucks", value=str(check_user(message.author.id, 'bucks')) + ' ☣️', inline=False)
+                embed.add_field(name="nCoV-Bucks", value=str(check_user(message.author.id, 'bucks')) + ' ☣️',
+                                inline=False)
                 await message.channel.send('{0.author.mention}'.format(message), embed=embed)
 
             elif message.content.startswith('*bal <@'):
@@ -135,11 +144,17 @@ class MyClient(discord.Client):
                 top_list = sorted(top_list, key=itemgetter(1))
                 for n in range(1, 6):
                     top_five.append(top_list[-n])
-                embed = discord.Embed(title="Highest Balances", description="1. **" + top_five[0][0] + '** with **' + str(top_five[0][1]) + "** ☣️.\n"
-                                                                            "2. **" + top_five[1][0] + '** with **' + str(top_five[1][1]) + "** ☣️.\n"
-                                                                            "3. **" + top_five[2][0] + '** with **' + str(top_five[2][1]) + "** ☣️.\n"
-                                                                            "4. **" + top_five[3][0] + '** with **' + str(top_five[3][1]) + "** ☣️.\n"
-                                                                            "5. **" + top_five[4][0] + '** with **' + str(top_five[4][1]) + "** ☣️.", color=0xffa500)
+                embed = discord.Embed(title="Highest Balances",
+                                      description="1. **" + top_five[0][0] + '** with **' + str(
+                                          top_five[0][1]) + "** ☣️.\n"
+                                                            "2. **" + top_five[1][0] + '** with **' + str(
+                                          top_five[1][1]) + "** ☣️.\n"
+                                                            "3. **" + top_five[2][0] + '** with **' + str(
+                                          top_five[2][1]) + "** ☣️.\n"
+                                                            "4. **" + top_five[3][0] + '** with **' + str(
+                                          top_five[3][1]) + "** ☣️.\n"
+                                                            "5. **" + top_five[4][0] + '** with **' + str(
+                                          top_five[4][1]) + "** ☣️.", color=0xffa500)
 
                 await message.channel.send('{0.author.mention}'.format(message), embed=embed)
 
@@ -162,8 +177,10 @@ class MyClient(discord.Client):
                 for person in infected:
                     stat_description = stat_description + '\n' + person
                 stat_description = stat_description + '\n\n'
-                stat_description = stat_description + 'Combined Healthy nCoV-Bucks: **' + str(healthy_money) + "** ☣️.\n"
-                stat_description = stat_description + 'Combined Infected nCoV-Bucks: **' + str(infected_money) + "** ☣️."
+                stat_description = stat_description + 'Combined Healthy nCoV-Bucks: **' + str(
+                    healthy_money) + "** ☣️.\n"
+                stat_description = stat_description + 'Combined Infected nCoV-Bucks: **' + str(
+                    infected_money) + "** ☣️."
                 embed = discord.Embed(title="Statistics", description=stat_description, color=0xffa500)
                 await message.channel.send('{0.author.mention}'.format(message), embed=embed)
 
@@ -175,9 +192,12 @@ class MyClient(discord.Client):
                 member = str(message.guild.get_member(message.author.id))
                 embed = discord.Embed(title="Profile (" + member + ")", color=color)
                 embed.add_field(name="State", value=str(check_user(message.author.id, 'state').title()), inline=False)
-                embed.add_field(name="nCoV-Bucks", value=str(check_user(message.author.id, 'bucks')) + ' ☣️', inline=False)
+                embed.add_field(name="nCoV-Bucks", value=str(check_user(message.author.id, 'bucks')) + ' ☣️',
+                                inline=False)
                 embed.add_field(name="Coughs", value=str(check_user(message.author.id, 'coughs') + ' 🤧'), inline=False)
-                embed.add_field(name="Current Face Mask", value='% Immunity: ' + str(check_user(message.author.id, 'immunity')) + '\nDurability: ' + str(check_user(message.author.id, 'usage')), inline=False)
+                embed.add_field(name="Current Face Mask", value='% Immunity: ' + str(
+                    check_user(message.author.id, 'immunity')) + '\nDurability: ' + str(
+                    check_user(message.author.id, 'usage')), inline=False)
                 await message.channel.send('{0.author.mention}'.format(message), embed=embed)
 
             elif message.content.startswith('*profile <@'):
@@ -192,11 +212,14 @@ class MyClient(discord.Client):
                 embed.add_field(name="State", value=str(check_user(check_id, 'state').title()), inline=False)
                 embed.add_field(name="nCoV-Bucks", value=str(check_user(check_id, 'bucks')) + ' ☣️', inline=False)
                 embed.add_field(name="Coughs", value=str(check_user(check_id, 'coughs') + ' 🤧'), inline=False)
-                embed.add_field(name="Current Face Mask", value='% Immunity: ' + str(check_user(check_id, 'immunity')) + '\nDurability: ' + str(check_user(check_id, 'usage')), inline=False)
+                embed.add_field(name="Current Face Mask",
+                                value='% Immunity: ' + str(check_user(check_id, 'immunity')) + '\nDurability: ' + str(
+                                    check_user(check_id, 'usage')), inline=False)
                 await message.channel.send('{0.author.mention}'.format(message), embed=embed)
 
             elif message.content == '*collect':
-                if datetime.datetime.now() - parser.parse(check_user(message.author.id, 'last_collection')) >= datetime.timedelta(hours=6):
+                if datetime.datetime.now() - parser.parse(
+                        check_user(message.author.id, 'last_collection')) >= datetime.timedelta(hours=6):
                     collected = randint(50, 200)
                     if collected % 10 == 0:
                         embed = discord.Embed(title="Collection Successful",
@@ -219,15 +242,21 @@ class MyClient(discord.Client):
                     await message.channel.send('{0.author.mention}'.format(message), embed=embed)
 
             elif message.content.startswith('*pay <@'):
-                pay_id = ''.join(list(message.content)[list(message.content).index(">") - 18:list(message.content).index(">")])
+                pay_id = ''.join(
+                    list(message.content)[list(message.content).index(">") - 18:list(message.content).index(">")])
                 amount = ''.join(list(message.content)[list(message.content).index(">") + 2:])
                 try:
                     if int(amount) >= 0:
                         if int(check_user(message.author.id, 'bucks')) >= int(amount):
                             if str(check_user(message.author.id, 'state')) == str(check_user(int(pay_id), 'state')):
-                                embed = discord.Embed(title="Transfer Successful", description='**' + str(message.author.name) + '** paid **' + str(amount) + '** ☣️ to **' + str(message.guild.get_member(int(pay_id))) + '**.', color=0x00ff00)
+                                embed = discord.Embed(title="Transfer Successful",
+                                                      description='**' + str(message.author.name) + '** paid **' + str(
+                                                          amount) + '** ☣️ to **' + str(
+                                                          message.guild.get_member(int(pay_id))) + '**.',
+                                                      color=0x00ff00)
                                 await message.channel.send('{0.author.mention}'.format(message), embed=embed)
-                                change_file(message.author.id, 'bucks', int(check_user(message.author.id, 'bucks')) - int(amount))
+                                change_file(message.author.id, 'bucks',
+                                            int(check_user(message.author.id, 'bucks')) - int(amount))
                                 change_file(int(pay_id), 'bucks', int(check_user(int(pay_id), 'bucks')) + int(amount))
                             else:
                                 embed = discord.Embed(title="Transfer Failed",
@@ -253,12 +282,14 @@ class MyClient(discord.Client):
             elif message.content == '*shop':
                 if check_user(message.author.id, 'state') == 'healthy':
                     embed = discord.Embed(title="Shop (Healthy)", color=0x00ff00)
-                    embed.add_field(name="1. Disposable Face Mask (50 ☣️)", value="Description: *A disposable face mask for minimal protection.*\n"
-                                                                               "Immunity: **50%**\n"
-                                                                               "Durability: **2**\n————————————————————————————", inline=False)
-                    embed.add_field(name="2. N95 Face Mask (200 ☣️)", value="Description: *Better protection, more durable, higher cost.*\n"
-                                                                         "Immunity: **80%**\n"
-                                                                         "Durability: **5**\n————————————————————————————", inline=False)
+                    embed.add_field(name="1. Disposable Face Mask (50 ☣️)",
+                                    value="Description: *A disposable face mask for minimal protection.*\n"
+                                          "Immunity: **50%**\n"
+                                          "Durability: **2**\n————————————————————————————", inline=False)
+                    embed.add_field(name="2. N95 Face Mask (200 ☣️)",
+                                    value="Description: *Better protection, more durable, higher cost.*\n"
+                                          "Immunity: **80%**\n"
+                                          "Durability: **5**\n————————————————————————————", inline=False)
                     embed.add_field(name="3. Gas Mask (1000 ☣️)",
                                     value="Description: *It's literally just a gas mask.*\n"
                                           "Immunity: **99%**\n"
@@ -384,17 +415,20 @@ class MyClient(discord.Client):
                                                           description='**' + message.author.name + "** infected **" + member + '**. \n **' + member + "**'s immunity was not strong enough.",
                                                           color=0x00ff00)
                                     await message.channel.send('{0.author.mention}'.format(message), embed=embed)
-                                    change_file(message.author.id, 'coughs', int(check_user(message.author.id, 'coughs')) - 1)
+                                    change_file(message.author.id, 'coughs',
+                                                int(check_user(message.author.id, 'coughs')) - 1)
                                     change_file(cough_id, 'state', 'infected')
                                     change_file(cough_id, 'immunity', 0)
                                     change_file(cough_id, 'usage', 0)
                                 else:
                                     embed = discord.Embed(title="Close Call!",
                                                           description='**' + message.author.name + "** coughed on **" + member + '**. \n **' + member + "**'s " + str(
-                                                              check_user(cough_id, 'immunity')) + "% immunity protected them from infection, for now...",
+                                                              check_user(cough_id,
+                                                                         'immunity')) + "% immunity protected them from infection, for now...",
                                                           color=0xff0000)
                                     await message.channel.send('{0.author.mention}'.format(message), embed=embed)
-                                    change_file(message.author.id, 'coughs', int(check_user(message.author.id, 'coughs')) - 1)
+                                    change_file(message.author.id, 'coughs',
+                                                int(check_user(message.author.id, 'coughs')) - 1)
                                     change_file(cough_id, 'usage', int(check_user(cough_id, 'usage')) - 1)
                                     if int(check_user(cough_id, 'usage')) == 0:
                                         change_file(cough_id, 'immunity', 0)
